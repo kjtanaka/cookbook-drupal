@@ -24,6 +24,7 @@ include_recipe 'database::mysql'
 include_recipe 'iptables::disabled'
 include_recipe 'selinux::disabled'
 
+# TODO: php packages should probably be replaced with cookbook php.
 packages = %w[rsync httpd php php-mysql php-mbstring gd php-gd php-xml]
 
 packages.each do |pkg|
