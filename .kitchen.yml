@@ -1,0 +1,25 @@
+---
+driver:
+  name: vagrant
+
+provisioner:
+  name: chef_solo
+
+platforms:
+  - name: centos-6.5
+    driver_config:
+      box: chef/centos-6.5
+      network:
+        - ["private_network", {ip: "192.168.33.33"}]
+
+suites:
+  - name: default
+    run_list:
+      - recipe[drupal::default]
+    attributes: {
+      "mysql": {
+        "server_debian_password": "Paskai0e0kge",
+        "server_root_password": "Paskai0e0kge",
+        "server_repl_password": "Paskai0e0kge"
+      }
+    }
