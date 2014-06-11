@@ -25,14 +25,12 @@ include_recipe 'iptables::disabled'
 include_recipe 'selinux::disabled'
 
 mysql_root_password = node['mysql']['server_root_password']
-drupal_version = "6.31" 
-#drupal_version = "7.28" 
+drupal_version = node['drupal']['version']
 drupal_download_url = "http://ftp.drupal.org/files/projects/drupal-#{drupal_version}.tar.gz"
-drupal_db_name = "drupal"
-drupal_db_user = "admin"
-drupal_db_user_password = "DrupalDBPassw0rd"
+drupal_db_name = node['drupal']['db_name']
+drupal_db_user = node['drupal']['db_user']
+drupal_db_user_password = node['drupal']['db_user_password']
 
-# TODO: php packages should probably be replaced with cookbook php.
 packages = %w[rsync httpd php php-mysql php-mbstring gd php-gd php-xml]
 
 packages.each do |pkg|
