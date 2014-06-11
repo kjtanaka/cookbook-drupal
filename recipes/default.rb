@@ -24,6 +24,14 @@ include_recipe 'database::mysql'
 include_recipe 'iptables::disabled'
 include_recipe 'selinux::disabled'
 
+mysql_root_password = node['mysql']['server_root_password']
+drupal_version = "6.31" 
+#drupal_version = "7.28" 
+drupal_download_url = "http://ftp.drupal.org/files/projects/drupal-#{drupal_version}.tar.gz"
+drupal_db_name = "drupal"
+drupal_db_user = "admin"
+drupal_db_user_password = "DrupalDBPassw0rd"
+
 # TODO: php packages should probably be replaced with cookbook php.
 packages = %w[rsync httpd php php-mysql php-mbstring gd php-gd php-xml]
 
@@ -39,17 +47,17 @@ end
 
 mysql_connection_info = {:host => "localhost",
                          :username => 'root',
-                         :password => node['mysql']['server_root_password']}
+                         :password => mysql_root_password}
 
 mysql_database "drupal" do
   connection mysql_connection_info
   action :create
 end
 
-mysql_database_user "admin" do
+mysql_database_user drupal_db_user do
   connection mysql_connection_info
-  password "PkkdJJGKLE"
-  database_name "drupal"
+  password drupal_db_user_password
+  database_name drupal_db_name
   privileges [:all]
   action [:create, :grant]
 end
@@ -60,14 +68,14 @@ end
 
 execute "download_drupal" do
   cwd "/root/downloads"
-  command "wget http://ftp.drupal.org/files/projects/drupal-7.28.tar.gz"
-  creates "drupal-7.28.tar.gz"
+  command "wget #{drupal_download_url}"
+  creates "drupal-#{drupal_version}.tar.gz"
 end
 
 execute "extract_tarball" do
   cwd "/root/downloads"
-  command "tar zxvf drupal-7.28.tar.gz"
-  creates "drupal-7.28"
+  command "tar zxvf drupal-#{drupal_version}.tar.gz"
+  creates "drupal-#{drupal_version}"
 end
 
 script "install_drupal" do
@@ -75,7 +83,7 @@ script "install_drupal" do
   user "root"
   cwd "/root/downloads"
   code <<-EOH
-  rsync -av drupal-7.28/ /var/www/html
+  rsync -av drupal-#{drupal_version}/ /var/www/html
   cp /var/www/html/sites/default/default.settings.php /var/www/html/sites/default/settings.php
   chown -R apache:apache /var/www/html
   EOH
