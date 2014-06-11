@@ -71,22 +71,13 @@ execute "extract_tarball" do
 end
 
 script "install_drupal" do
+  interpreter "bash"
   user "root"
   cwd "/root/downloads"
   code <<-EOH
-  /usr/bin/rsync -av drupal-7.28/ /var/www/html
+  rsync -av drupal-7.28/ /var/www/html
+  cp /var/www/html/sites/default/default.settings.php /var/www/html/sites/default/settings.php
   chown -R apache:apache /var/www/html
   EOH
   creates "/var/www/html/sites"
-end
-
-template "/var/www/html/sites/default/settings.php" do
-  owner "apache"
-  group "apache"
-  mode "0644"
-	variables(
-    :database => "drupal",
-    :username => "admin",
-    :password => "PkkdJJGKLE"
-  )
 end
