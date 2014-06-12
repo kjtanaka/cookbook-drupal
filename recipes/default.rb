@@ -31,7 +31,7 @@ drupal_db_name = node['drupal']['db_name']
 drupal_db_user = node['drupal']['db_user']
 drupal_db_user_password = node['drupal']['db_user_password']
 
-packages = %w[rsync httpd php php-mysql php-mbstring gd php-gd php-xml]
+packages = %w[wget rsync httpd php php-mysql php-mbstring gd php-gd php-xml]
 
 packages.each do |pkg|
   package pkg do

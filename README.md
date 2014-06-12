@@ -1,6 +1,6 @@
 drupal Cookbook
 ===============
-This cookbook installs Drupal for a testing purpose. The reason of "a testing purpose" is that it turns off `iptables` and `selinux`.
+This cookbook installs Drupal and its dependencies for a testing purpose. The reason of "a testing purpose" is that it turns off `iptables` and `selinux`.
 
 Requirements
 ------------
@@ -56,10 +56,7 @@ Attributes
 Usage
 -----
 #### drupal::default
-TODO: Write usage instructions for each cookbook.
-
-e.g.
-Just include `drupal` in your node's `run_list`:
+Include `drupal` in your node's `run_list`:
 
 ```json
 {
