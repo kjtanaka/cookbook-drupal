@@ -16,10 +16,4 @@ suites:
   - name: default
     run_list:
       - recipe[drupal::default]
-    attributes: {
-      "mysql": {
-        "server_debian_password": "Paskai0e0kge",
-        "server_root_password": "Paskai0e0kge",
-        "server_repl_password": "Paskai0e0kge"
-      }
-    }
+    attributes: {}
