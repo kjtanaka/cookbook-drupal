@@ -1,23 +1,24 @@
 drupal Cookbook
 ===============
-TODO: Enter the cookbook description here.
-
-e.g.
-This cookbook makes your favorite breakfast sandwich.
+This cookbook installs Drupal for a testing purpose. The reason of "a testing purpose" is that it turns off `iptables` and `selinux`.
 
 Requirements
 ------------
-TODO: List your cookbook requirements. Be sure to include any requirements this cookbook has on platforms, libraries, other cookbooks, packages, operating systems, etc.
 
-e.g.
-#### packages
-- `toaster` - drupal needs toaster to brown your bagel.
+#### platform
+CentOS 6.5 is supported and tested.
+
+#### cookbooks
+This cookbook depends on the following cookbooks.
+
+* mysql
+* database
+* iptables
+* selinux
 
 Attributes
 ----------
-TODO: List your cookbook attributes here.
 
-e.g.
 #### drupal::default
 <table>
   <tr>
@@ -27,10 +28,28 @@ e.g.
     <th>Default</th>
   </tr>
   <tr>
-    <td><tt>['drupal']['bacon']</tt></td>
-    <td>Boolean</td>
-    <td>whether to include bacon</td>
-    <td><tt>true</tt></td>
+    <td><tt>['drupal']['version']</tt></td>
+    <td>Text</td>
+    <td>Drupal version</td>
+    <td><tt>7.28</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['drupal']['db_name']</tt></td>
+    <td>Text</td>
+    <td>Database name</td>
+    <td><tt>drupal</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['drupal']['db_user']</tt></td>
+    <td>Text</td>
+    <td>Database user name</td>
+    <td><tt>drupaladmin</tt></td>
+  </tr>
+  <tr>
+    <td><tt>['drupal']['db_user_password']</tt></td>
+    <td>Text</td>
+    <td>Database user password</td>
+    <td><tt>DrupalDBPassw0rd</tt></td>
   </tr>
 </table>
 
@@ -53,9 +72,7 @@ Just include `drupal` in your node's `run_list`:
 
 Contributing
 ------------
-TODO: (optional) If this is a public cookbook, detail the process for contributing. If this is a private cookbook, remove this section.
 
-e.g.
 1. Fork the repository on Github
 2. Create a named feature branch (like `add_component_x`)
 3. Write your change
@@ -65,4 +82,21 @@ e.g.
 
 License and Authors
 -------------------
-Authors: TODO: List authors
+
+- Author:: Koji Tanaka (<kj.tanaka@gmail.com>)
+
+```text
+Copyright:: 2014 FutureGrid Project, Indiana University
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
