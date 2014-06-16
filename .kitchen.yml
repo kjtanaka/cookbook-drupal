@@ -9,6 +9,9 @@ platforms:
   - name: centos-6.5
     driver_config:
       box: chef/centos-6.5
+      customize:
+        memory: 512
+        cpuexecutioncap: 50
       network:
         - ["private_network", {ip: "192.168.33.33"}]
 
@@ -16,5 +19,9 @@ suites:
   - name: default
     run_list:
       - recipe[drupal::default]
-      #- recipe[drupal::backup]
+      - recipe[drupal::backup]
+    attributes: {}
+  - name: restore
+    run_list:
+      - recipe[drupal::restore]
     attributes: {}

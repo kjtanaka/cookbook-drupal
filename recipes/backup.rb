@@ -22,35 +22,24 @@ drupal_version = node['drupal']['version']
 drupal_db_name = node['drupal']['db_name']
 drupal_db_user = node['drupal']['db_user']
 drupal_db_user_password = node['drupal']['db_user_password']
-drupal_backup = "drupal-backup"
-drupal_dir = "/var/www/html"
-drupal_backup_work_dir = "/tmp"
+drupal_backup_name = node['drupal']['backup_name']
+drupal_dir = node['drupal']['install_dir']
+drupal_work_dir = node['drupal']['work_dir']
 
-directory "#{drupal_backup_work_dir}/#{drupal_backup}" do
+directory drupal_work_dir do
   action :create
 end
 
-script "backup_database" do
+script "backup_drupal" do
   interpreter "bash"
   user "root"
-  cwd "#{drupal_backup_work_dir}/#{drupal_backup}"
+  cwd "#{drupal_work_dir}"
   code <<-EOH
-  mysqldump -u#{drupal_db_user} -p#{drupal_db_user_password} #{drupal_db_name} > DATABASE.sql
-  tar czvf DATABASE.tar.gz DATABASE.sql
-  rm -f DATABASE.sql
+  rsync -av --delete #{drupal_dir}/ #{drupal_backup_name}
+  mysqldump -u#{drupal_db_user} -p#{drupal_db_user_password} #{drupal_db_name} > #{drupal_backup_name}/DATABASE.sql
+  tar czvf #{drupal_backup_name}.tar.gz #{drupal_backup_name}
+  rm -rf #{drupal_backup_name}
   EOH
-  creates "DATABASE.tar.gz"
-end
-
-script "backup_files" do
-  interpreter "bash"
-  user "root"
-  cwd "#{drupal_backup_work_dir}/#{drupal_backup}"
-  code <<-EOH
-  rsync -av #{drupal_dir}/ FILES
-  tar czvf FILES.tar.gz FILES
-  rm -rf FILES
-  EOH
-  creates "FILES.tar.gz"
+  creates "#{drupal_backup_name}.tar.gz"
 end
 
