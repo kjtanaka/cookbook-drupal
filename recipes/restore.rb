@@ -18,12 +18,12 @@
 # limitations under the License.
 #
 
-drupal_version = node['drupal']['version']
-drupal_files_tarball = "/tmp/drupal-backup/FILES.tar.gz"
-drupal_database_tarball = "/tmp/drupal-backup/DATABASE.tar.gz"
 drupal_db_name = node['drupal']['db_name']
 drupal_db_user = node['drupal']['db_user']
 drupal_db_user_password = node['drupal']['db_user_password']
+drupal_backup_name = node['drupal']['backup_name']
+drupal_dir = node['drupal']['install_dir']
+drupal_work_dir = node['drupal']['work_dir']
 mysql_root_password = node['mysql']['server_root_password']
 node.default['mysql']['server_debian_password'] = mysql_root_password
 node.default['mysql']['server_root_password'] = mysql_root_password
@@ -52,18 +52,38 @@ mysql_connection_info = {:host => "localhost",
                          :password => mysql_root_password}
 
 
-directory "/root/drupal_work_dir" do
+directory drupal_work_dir do
   action :create
 end
 
-#script "install_drupal" do
-#  interpreter "bash"
-#  user "root"
-#  cwd "/root/downloads"
-#  code <<-EOH
-#  EOH
-#  creates "/var/www/html/sites"
-#end
+cookbook_file "#{drupal_work_dir}/#{drupal_backup_name}.tar.gz" do
+  source "#{drupal_backup_name}.tar.gz"
+  mode "0644"
+  owner "root"
+  group "root"
+  action :create_if_missing
+end
+
+execute "extract_tarball" do
+  cwd drupal_work_dir
+  command "tar zxvf #{drupal_backup_name}.tar.gz"
+  creates "#{drupal_backup_name}"
+end
+
+mysql_connection_info = {:host => "localhost",
+                         :username => 'root',
+                         :password => mysql_root_password}
+
+mysql_database drupal_db_name do
+  connection mysql_connection_info
+  action [:drop, :create]
+end
+
+mysql_database drupal_db_name do
+  connection mysql_connection_info
+  sql { ::File.open("#{drupal_work_dir}/#{drupal_backup_name}/DATABASE.sql").read }
+  action :query
+end
 
 mysql_database_user drupal_db_user do
   connection mysql_connection_info
@@ -73,21 +93,14 @@ mysql_database_user drupal_db_user do
   action [:create, :grant]
 end
 
-#execute "extract_tarball" do
-  #cwd "/root/downloads"
-  #command "tar zxvf drupal-#{drupal_version}.tar.gz"
-  #creates "drupal-#{drupal_version}"
-#end
-
-#script "install_drupal" do
-  #interpreter "bash"
-  #user "root"
-  #cwd "/root/downloads"
-  #code <<-EOH
-  #rsync -av drupal-#{drupal_version}/ /var/www/html
-  #cp /var/www/html/sites/default/default.settings.php /var/www/html/sites/default/settings.php
-  #chown -R apache:apache /var/www/html
-  #EOH
-  #creates "/var/www/html/sites"
-#end
+script "restore_files" do
+  interpreter "bash"
+  user "root"
+  cwd drupal_work_dir
+  code <<-EOH
+  rsync -av --exclude=DATABASE.sql #{drupal_backup_name}/ #{drupal_dir}
+  chown -R apache:apache #{drupal_dir}
+  EOH
+  creates "#{drupal_dir}/sites"
+end
 

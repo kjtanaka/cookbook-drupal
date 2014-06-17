@@ -4,6 +4,8 @@ driver:
 
 provisioner:
   name: chef_solo
+  solo_rb:
+    ssl_verify_mode: verify_peer
 
 platforms:
   - name: centos-6.5
@@ -12,8 +14,6 @@ platforms:
       customize:
         memory: 512
         cpuexecutioncap: 50
-      network:
-        - ["private_network", {ip: "192.168.33.33"}]
 
 suites:
   - name: default
@@ -21,7 +21,23 @@ suites:
       - recipe[drupal::default]
       - recipe[drupal::backup]
     attributes: {}
+    driver_config:
+      network:
+        - ["private_network", {ip: "192.168.33.31"}]
   - name: restore
     run_list:
       - recipe[drupal::restore]
+      - recipe[drupal::_clean]
     attributes: {}
+    driver_config:
+      network:
+        - ["private_network", {ip: "192.168.33.32"}]
+  - name: backup
+    run_list:
+      - recipe[drupal::restore]
+      - recipe[drupal::_clean]
+      - recipe[drupal::backup]
+    attributes: {}
+    driver_config:
+      network:
+        - ["private_network", {ip: "192.168.33.33"}]
