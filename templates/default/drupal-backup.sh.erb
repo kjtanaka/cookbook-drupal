@@ -1,0 +1,16 @@
+#/bin/bash
+
+set e
+
+DRUPAL_DIR="<%= @drupal_dir %>"
+DRUPAL_BACKUP_NAME="<%= @drupal_backup_name %>"
+DRUPAL_DB_USER="<%= @drupal_db_user %>"
+DRUPAL_DB_NAME="<%= @drupal_db_name %>"
+DRUPAL_DB_PASS="<%= @drupal_db_password %>"
+DRUPAL_WORK_DIR="<%= @drupal_work_dir %>"
+
+cd $DRUPAL_WORK_DIR
+rsync -av $DRUPAL_DIR/ $DRUPAL_BACKUP_NAME
+mysqldump -u$DRUPAL_DB_USER -p$DRUPAL_DB_PASS $DRUPAL_DB_NAME > $DRUPAL_BACKUP_NAME/DATABASE.sql
+tar czvf ${DRUPAL_BACKUP_NAME}.tar.gz $DRUPAL_BACKUP_NAME
+rm -rf $DRUPAL_BACKUP_NAME

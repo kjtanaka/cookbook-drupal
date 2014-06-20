@@ -19,7 +19,8 @@ suites:
   - name: default
     run_list:
       - recipe[drupal::default]
-      - recipe[drupal::backup]
+      - recipe[drupal::_backup_script]
+      - recipe[drupal::_https]
     attributes: {}
     driver_config:
       network:
@@ -28,6 +29,7 @@ suites:
     run_list:
       - recipe[drupal::restore]
       - recipe[drupal::_clean]
+      - recipe[drupal::_https]
     attributes: {}
     driver_config:
       network:
