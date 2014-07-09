@@ -24,13 +24,21 @@ drupal_db_user_password = node['drupal']['db_user_password']
 drupal_backup_name = node['drupal']['backup_name']
 drupal_dir = node['drupal']['install_dir']
 drupal_work_dir = node['drupal']['work_dir']
-mysql_root_password = node['mysql']['db_root_password']
-node.default['mysql']['server_debian_password'] = mysql_root_password
-node.default['mysql']['server_root_password'] = mysql_root_password
-node.default['mysql']['server_repl_password'] = mysql_root_password
+mysql_root_password = node['drupal']['db_root_password']
+node.set['mysql']['server_debian_password'] = mysql_root_password
+node.set['mysql']['server_root_password'] = mysql_root_password
+node.set['mysql']['server_repl_password'] = mysql_root_password
 
 include_recipe 'mysql::client'
 include_recipe 'mysql::server'
+
+template '/etc/mysql/conf.d/mysite.cnf' do
+  owner 'mysql'
+  owner 'mysql'      
+  source 'mysite.cnf.erb'
+  notifies :restart, 'mysql_service[default]'
+end
+
 include_recipe 'database::mysql'
 include_recipe 'iptables::disabled'
 include_recipe 'selinux::disabled'
