@@ -87,10 +87,19 @@ mysql_database drupal_db_name do
   action [:drop, :create]
 end
 
-mysql_database drupal_db_name do
-  connection mysql_connection_info
-  sql { ::File.open("#{drupal_work_dir}/#{drupal_backup_name}/DATABASE.sql").read }
-  action :query
+#mysql_database drupal_db_name do
+#  connection mysql_connection_info
+#  sql { ::File.open("#{drupal_work_dir}/#{drupal_backup_name}/DATABASE.sql").read }
+#  action :query
+#end
+
+bash "restore_db" do
+  cwd "#{drupal_work_dir}/#{drupal_backup_name}"
+  code <<-EOF
+  mysql -uroot -p#{mysql_root_password} #{drupal_db_name} < DATABASE.sql
+  touch .db_restored
+  EOF
+  creates ".db_restored"
 end
 
 mysql_database_user drupal_db_user do
@@ -106,7 +115,7 @@ script "restore_files" do
   user "root"
   cwd drupal_work_dir
   code <<-EOH
-  rsync -av --exclude=DATABASE.sql #{drupal_backup_name}/ #{drupal_dir}
+  rsync -av --exclude=DATABASE.sql --exclude=.db_restored #{drupal_backup_name}/ #{drupal_dir}
   chown -R apache:apache #{drupal_dir}
   EOH
   creates "#{drupal_dir}/sites"
