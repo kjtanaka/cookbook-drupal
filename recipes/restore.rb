@@ -36,6 +36,9 @@ template '/etc/mysql/conf.d/mysite.cnf' do
   owner 'mysql'
   owner 'mysql'      
   source 'mysite.cnf.erb'
+  variables(
+    :mysql_max_allowed_packet => node['drupal']['mysql_max_allowed_packet']
+  )
   notifies :restart, 'mysql_service[default]'
 end
 
@@ -84,22 +87,7 @@ mysql_connection_info = {:host => "localhost",
 
 mysql_database drupal_db_name do
   connection mysql_connection_info
-  action [:drop, :create]
-end
-
-#mysql_database drupal_db_name do
-#  connection mysql_connection_info
-#  sql { ::File.open("#{drupal_work_dir}/#{drupal_backup_name}/DATABASE.sql").read }
-#  action :query
-#end
-
-bash "restore_db" do
-  cwd "#{drupal_work_dir}/#{drupal_backup_name}"
-  code <<-EOF
-  mysql -uroot -p#{mysql_root_password} #{drupal_db_name} < DATABASE.sql
-  touch .db_restored
-  EOF
-  creates ".db_restored"
+  action [:create]
 end
 
 mysql_database_user drupal_db_user do
@@ -108,6 +96,15 @@ mysql_database_user drupal_db_user do
   database_name drupal_db_name
   privileges [:all]
   action [:create, :grant]
+end
+
+bash "restore_db" do
+  cwd "#{drupal_work_dir}/#{drupal_backup_name}"
+  code <<-EOF
+  mysql -uroot -p#{mysql_root_password} #{drupal_db_name} < DATABASE.sql
+  touch .db_restored
+  EOF
+  creates ".db_restored"
 end
 
 script "restore_files" do

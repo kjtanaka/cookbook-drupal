@@ -8,6 +8,9 @@ default['drupal']['backup_name'] = "drupal-backup"
 default['drupal']['install_dir'] = "/var/www/html"
 default['drupal']['work_dir'] = "/root/drupal_work_dir"
 
+# MySQL config
+default['drupal']['mysql_max_allowed_packet'] = "32M"
+
 # _https
 default['drupal']['ca_key'] = "/etc/pki/tls/private/ca.key"
 default['drupal']['ca_csr'] = "/etc/pki/tls/private/ca.csr"
