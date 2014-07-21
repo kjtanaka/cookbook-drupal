@@ -101,7 +101,7 @@ end
 bash "restore_db" do
   cwd "#{drupal_work_dir}/#{drupal_backup_name}"
   code <<-EOF
-  mysql -uroot -p#{mysql_root_password} #{drupal_db_name} < DATABASE.sql
+  mysql --max_allowed_packet=#{node['drupal']['mysql_max_allowed_packet']} -uroot -p#{mysql_root_password} #{drupal_db_name} < DATABASE.sql
   touch .db_restored
   EOF
   creates ".db_restored"
