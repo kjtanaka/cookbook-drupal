@@ -39,7 +39,7 @@ template '/etc/mysql/conf.d/mysite.cnf' do
   variables(
     :mysql_max_allowed_packet => node['drupal']['mysql_max_allowed_packet']
   )
-  notifies :restart, 'mysql_service[default]'
+  notifies :restart, 'mysql_service[default]', :immediately
 end
 
 include_recipe 'database::mysql'
