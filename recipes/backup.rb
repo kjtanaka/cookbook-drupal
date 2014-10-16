@@ -25,6 +25,7 @@ drupal_db_user_password = node['drupal']['db_user_password']
 drupal_backup_name = node['drupal']['backup_name']
 drupal_dir = node['drupal']['install_dir']
 drupal_work_dir = node['drupal']['work_dir']
+day = Time.new.strftime("%Y-%m-%d")
 
 directory drupal_work_dir do
   action :create
@@ -35,11 +36,11 @@ script "backup_drupal" do
   user "root"
   cwd "#{drupal_work_dir}"
   code <<-EOH
-  rsync -av --delete #{drupal_dir}/ #{drupal_backup_name}
-  mysqldump -u#{drupal_db_user} -p#{drupal_db_user_password} #{drupal_db_name} > #{drupal_backup_name}/DATABASE.sql
-  tar czvf #{drupal_backup_name}.tar.gz #{drupal_backup_name}
-  rm -rf #{drupal_backup_name}
+  rsync -a --stats --delete --exclude="sites/default/files/backup_migrate/scheduled/*" #{drupal_dir}/ #{drupal_backup_name}
+  mysqldump --lock-tables=false -u#{drupal_db_user} -p#{drupal_db_user_password} #{drupal_db_name} > #{drupal_backup_name}/DATABASE.sql
+  tar czvf #{drupal_backup_name}-#{day}.tar.gz #{drupal_backup_name}
+  #rm -rf #{drupal_backup_name}
   EOH
-  creates "#{drupal_backup_name}.tar.gz"
+  creates "#{drupal_backup_name}-#{day}.tar.gz"
 end
 
