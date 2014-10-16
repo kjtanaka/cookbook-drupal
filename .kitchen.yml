@@ -1,19 +1,19 @@
 ---
-driver:
-  name: vagrant
+driver_plugin: digitalocean
+driver_config:
+  digitalocean_client_id: <%= ENV['DIGITALOCEAN_CLIENT_ID'] %>
+  digitalocean_api_key: <%= ENV['DIGITALOCEAN_API_KEY'] %>
+  ssh_key: <%= ENV['DIGITALOCEAN_SSH_KEY_PATH'] %>
+  ssh_key_ids: <%= ENV['DIGITALOCEAN_SSH_KEY_IDS'] %>
 
 provisioner:
   name: chef_solo
-  solo_rb:
-    ssl_verify_mode: verify_peer
 
 platforms:
   - name: centos-6.5
+    driver_plugin: digitalocean
     driver_config:
-      box: chef/centos-6.5
-      customize:
-        memory: 512
-        cpuexecutioncap: 50
+      image_id: 6372108
 
 suites:
   - name: default
