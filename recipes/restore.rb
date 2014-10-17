@@ -18,16 +18,21 @@
 # limitations under the License.
 #
 
-drupal_db_name = node['drupal']['db_name']
-drupal_db_user = node['drupal']['db_user']
-drupal_db_user_password = node['drupal']['db_user_password']
-drupal_backup_name = node['drupal']['backup_name']
-drupal_dir = node['drupal']['install_dir']
+secrets = Chef::EncryptedDataBagItem.load("drupal", "secrets")
+drupal_db_name = secrets['db_name']
+drupal_db_user = secrets['db_user']
+drupal_db_user_password = secrets['db_user_password']
+mysql_root_password = secrets['mysql_root_password']
+node.default['mysql']['server_debian_password'] = mysql_root_password
+node.default['mysql']['server_root_password'] = mysql_root_password
+node.default['mysql']['server_repl_password'] = mysql_root_password
+
+drupal_version = node['drupal']['version']
+drupal_download_url = "http://ftp.drupal.org/files/projects/drupal-#{drupal_version}.tar.gz"
+drupal_install_dir = node['drupal']['install_dir']
 drupal_work_dir = node['drupal']['work_dir']
-mysql_root_password = node['drupal']['db_root_password']
-node.set['mysql']['server_debian_password'] = mysql_root_password
-node.set['mysql']['server_root_password'] = mysql_root_password
-node.set['mysql']['server_repl_password'] = mysql_root_password
+drupal_hostname = node['drupal']['hostname']
+drupal_backup_name = node['drupal']['backup_name']
 
 include_recipe 'mysql::client'
 include_recipe 'mysql::server'
@@ -43,10 +48,10 @@ template '/etc/mysql/conf.d/mysite.cnf' do
 end
 
 include_recipe 'database::mysql'
-include_recipe 'iptables::disabled'
+#include_recipe 'iptables::disabled'
 include_recipe 'selinux::disabled'
 
-packages = %w[wget rsync httpd php php-mysql php-mbstring gd php-gd php-xml]
+packages = node['drupal']['packages']
 
 packages.each do |pkg|
   package pkg do
@@ -112,9 +117,22 @@ script "restore_files" do
   user "root"
   cwd drupal_work_dir
   code <<-EOH
-  rsync -av --exclude=DATABASE.sql --exclude=.db_restored #{drupal_backup_name}/ #{drupal_dir}
-  chown -R apache:apache #{drupal_dir}
+  rsync -av --exclude=DATABASE.sql --exclude=.db_restored #{drupal_backup_name}/ #{drupal_install_dir}
+  chown -R apache:apache #{drupal_install_dir}
   EOH
-  creates "#{drupal_dir}/sites"
+  creates "#{drupal_install_dir}/sites"
 end
 
+ruby_block "Edit /etc/postfix/main.cf" do
+  block do
+    rc = Chef::Util::FileEdit.new("/etc/postfix/main.cf")
+    rc.insert_line_if_no_match("^myhostname.*$", "myhostname = #{drupal_hostname}")
+    rc.write_file
+  end
+  notifies :restart, "service[postfix]"
+end
+
+service "postfix" do
+  supports :restart => true
+  action :nothing
+end

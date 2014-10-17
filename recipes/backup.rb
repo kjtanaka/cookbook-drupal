@@ -17,11 +17,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+secrets = Chef::EncryptedDataBagItem.load("drupal", "secrets")
+drupal_db_name = secrets['db_name']
+drupal_db_user = secrets['db_user']
+drupal_db_user_password = secrets['db_user_password']
 
 drupal_version = node['drupal']['version']
-drupal_db_name = node['drupal']['db_name']
-drupal_db_user = node['drupal']['db_user']
-drupal_db_user_password = node['drupal']['db_user_password']
 drupal_backup_name = node['drupal']['backup_name']
 drupal_dir = node['drupal']['install_dir']
 drupal_work_dir = node['drupal']['work_dir']
@@ -41,6 +42,7 @@ script "backup_drupal" do
   touch .backed_up_#{day}
   EOH
   creates ".backed_up_#{day}"
+  timeout 14400
 end
 
 execute "archive_drupal" do

@@ -28,7 +28,7 @@ node.default['mysql']['server_root_password'] = mysql_root_password
 node.default['mysql']['server_repl_password'] = mysql_root_password
 
 drupal_version = node['drupal']['version']
-drupal_download_url = "http://ftp.drupal.org/files/projects/drupal-#{drupal_version}.tar.gz"
+drupal_download_url = node['drupal']['download_url']
 drupal_install_dir = node['drupal']['install_dir']
 drupal_hostname = node['drupal']['hostname']
 
@@ -38,7 +38,7 @@ include_recipe 'database::mysql'
 include_recipe 'iptables::disabled'
 include_recipe 'selinux::disabled'
 
-packages = %w[wget rsync httpd php php-mysql php-mbstring gd php-gd php-xml postfix]
+packages = node['drupal']['packages']
 
 packages.each do |pkg|
   package pkg do

@@ -21,6 +21,7 @@ suites:
       - recipe[drupal::default]
       - recipe[drupal::_backup_script]
       - recipe[drupal::_https]
+      - recipe[drupal::backup]
     data_bags_path: test/integration/default/data_bags
     encrypted_data_bag_secret_key_path: test/integration/default/data_bag_key
     attributes: {}
