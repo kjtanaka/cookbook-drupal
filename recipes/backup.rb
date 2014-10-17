@@ -34,13 +34,18 @@ end
 script "backup_drupal" do
   interpreter "bash"
   user "root"
-  cwd "#{drupal_work_dir}"
+  cwd drupal_work_dir
   code <<-EOH
   rsync -a --stats --delete --exclude="sites/default/files/backup_migrate/scheduled/*" #{drupal_dir}/ #{drupal_backup_name}
   mysqldump --lock-tables=false -u#{drupal_db_user} -p#{drupal_db_user_password} #{drupal_db_name} > #{drupal_backup_name}/DATABASE.sql
-  tar czvf #{drupal_backup_name}-#{day}.tar.gz #{drupal_backup_name}
-  #rm -rf #{drupal_backup_name}
+  touch .backed_up_#{day}
   EOH
-  creates "#{drupal_backup_name}-#{day}.tar.gz"
+  creates ".backed_up_#{day}"
 end
 
+execute "archive_drupal" do
+  user "root"
+  cwd drupal_work_dir
+  command "tar czvf #{drupal_backup_name}-#{day}.tar.gz #{drupal_backup_name}"
+  creates "#{drupal_backup_name}-#{day}.tar.gz"
+end
