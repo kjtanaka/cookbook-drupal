@@ -29,15 +29,11 @@ node.default['mysql']['server_debian_password'] = mysql_root_password
 node.default['mysql']['server_root_password'] = mysql_root_password
 node.default['mysql']['server_repl_password'] = mysql_root_password
 
-#if Chef::EncryptedDataBagItem.load("drupal", "secrets")
-#  secrets = Chef::EncryptedDataBagItem.load("drupal", "secrets")
-#end
+secrets = Chef::EncryptedDataBagItem.load("drupal", "secrets")
 
-#if secrets
-#  drupal_db_user_password = secrets['db_user_password']
-#  drupal_db_name = secrets['db_name']
-#  drupal_db_user = secrets['db_user']
-#end
+drupal_db_user_password = secrets['db_user_password']
+drupal_db_name = secrets['db_name']
+drupal_db_user = secrets['db_user']
 
 include_recipe 'mysql::client'
 include_recipe 'mysql::server'
