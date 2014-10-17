@@ -7,6 +7,7 @@ default['drupal']['db_user_password'] = "DrupalDBPassw0rd"
 default['drupal']['backup_name'] = "drupal-backup"
 default['drupal']['install_dir'] = "/var/www/html"
 default['drupal']['work_dir'] = "/root/drupal_work_dir"
+default['drupal']['hostname'] = "drupal.example.org"
 
 # MySQL config
 default['drupal']['mysql_max_allowed_packet'] = "32M"
