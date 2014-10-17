@@ -56,6 +56,18 @@ Attributes
 Usage
 -----
 #### drupal::default
+Create data bag drupal secrets like this.
+
+```
+{
+  "id": "secrets",
+  "db_name": "drupal",
+  "db_user": "drupaladmin",
+  "db_user_password": "abcd1234",
+  "mysql_root_password": "efgh5678"
+}
+```
+
 Include `drupal` in your node's `run_list`:
 
 ```json
