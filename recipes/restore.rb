@@ -43,7 +43,7 @@ template '/etc/mysql/conf.d/mysite.cnf' do
 end
 
 include_recipe 'database::mysql'
-include_recipe 'iptables::disabled'
+#include_recipe 'iptables::disabled'
 include_recipe 'selinux::disabled'
 
 packages = %w[wget rsync httpd php php-mysql php-mbstring gd php-gd php-xml]
